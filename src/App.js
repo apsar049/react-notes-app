@@ -1,25 +1,97 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import NotesList from './components/NotesList';
+import { nanoid } from 'nanoid';
+import Searchbar from './components/Searchbar';
 
-function App() {
+const App = () => {
+  const date = new Date().toLocaleDateString();
+  const [data, setData] = useState([
+    {
+      id: nanoid(),
+      text: 'hello this is a note',
+      date: date
+    },
+    {
+      id: nanoid(),
+      text: 'hello this is a note',
+      date: date
+    },
+    {
+      id: nanoid(),
+      text: 'hello this is a note',
+      date: date
+    },
+    {
+      id: nanoid(),
+      text: 'hello this is a note',
+      date: date
+    },
+    {
+      id: nanoid(),
+      text: 'hello this is a note',
+      date: date
+    },
+    {
+      id: nanoid(),
+      text: 'hello this is a note',
+      date: date
+    }
+  ]);
+  const [searchText, setSearchText] = useState('');
+
+  useEffect(
+    () => {
+      localStorage.setItem('react-notes-app-data', JSON.stringify(data));
+    },
+    [data]
+  );
+
+  useEffect(() => {
+    const localdata = JSON.parse(localStorage.getItem('react-notes-app-data'));
+
+    if (localdata) {
+      setData(localdata);
+    }
+  }, []);
+
+  function addNote(noteText) {
+    const newNote = {
+      id: nanoid(),
+      text: noteText,
+      date: new Date().toLocaleDateString()
+    };
+
+    const newData = [...data, newNote];
+
+    setData(newData);
+  }
+
+  function deleteNote(id) {
+    const newNote = data.filter(data => data.id !== id);
+    setData(newNote);
+  }
+
+  function handleSearchNote(text) {
+    // console.log(text);
+    setSearchText(text);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Searchbar handleSearchNote={handleSearchNote} />
+      <NotesList
+        data={
+          searchText
+            ? data.filter(data => {
+                data.text.toLowerCase().includes(searchText);
+              })
+            : data
+        }
+        addNote={addNote}
+        deleteNote={deleteNote}
+      />
     </div>
   );
-}
+};
 
 export default App;
